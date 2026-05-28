@@ -401,6 +401,7 @@
         width: 100%; height: 100%;
         display: block; border: 0;
         background: #000;
+        pointer-events: none; /* Vimeo schluckt sonst die Button-Klicks */
       }
 
       /* Custom Ton-Button (JC-Design, pulsierend im Default-Zustand) */
@@ -1480,30 +1481,32 @@
     };
 
     btn.addEventListener('click', async () => {
+      console.log('[Hero-Video] click · state=', state, 'busy=', busy);
       if (busy) return;
       busy = true;
       const prev = state;
-      // UI sofort umschalten
       const nextUi = prev === 'activate' ? 'sound'
                   : prev === 'sound'    ? 'muted'
                   : 'sound';
       setState(nextUi);
+      console.log('[Hero-Video] new state=', nextUi);
 
       try {
         const p = await ensurePlayer();
         if (prev === 'activate') {
-          // Erster Klick: Ton an + von 0 starten + abspielen
           await p.setMuted(false);
           try { await p.setVolume(1); } catch(e) {}
           try { await p.setCurrentTime(0); } catch(e) {}
           await p.play();
+          console.log('[Hero-Video] unmuted + restarted');
         } else if (prev === 'sound') {
-          // Muten — Video läuft weiter
           await p.setMuted(true);
+          try { await p.setVolume(0); } catch(e) {}
+          console.log('[Hero-Video] muted');
         } else if (prev === 'muted') {
-          // Entmuten — Video läuft weiter
           await p.setMuted(false);
           try { await p.setVolume(1); } catch(e) {}
+          console.log('[Hero-Video] unmuted');
         }
       } catch (e) {
         console.warn('[Hero-Video] Vimeo-Call fehlgeschlagen:', e);
