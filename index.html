@@ -94,7 +94,16 @@
     section.sect-tight { position: relative; padding: 3rem 1.5rem; }
     section.sect-wide  { position: relative; padding: 6rem 1.5rem; }
     /* Hero · -30% Padding gegenüber sect-wide */
-    section.sect-hero  { position: relative; padding: 4.2rem 1.5rem; }
+    section.sect-hero  {
+      position: relative;
+      padding: 4.2rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      isolation: isolate;
+      text-align: center;
+      min-height: 78vh;
+    }
     @media (max-width: 640px) {
       section.sect       { padding: 3.5rem 1.25rem; }
       section.sect-tight { padding: 2rem 1.25rem; }
@@ -613,6 +622,21 @@
     .case-card__sub {
       color: rgba(255,255,255,0.7); font-size: 0.98rem; line-height: 1.6; margin-bottom: 1rem;
     }
+    .case-card__bullets {
+      list-style: none; padding: 0; margin: 0.4rem 0 0;
+      display: grid; gap: 0.5rem;
+    }
+    .case-card__bullets li {
+      display: inline-flex; gap: 0.6rem; align-items: flex-start;
+      color: rgba(255,255,255,0.78); font-size: 0.96rem; line-height: 1.5;
+    }
+    .case-card__bullets li::before {
+      content: ''; flex-shrink: 0;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--jc-blue-300);
+      margin-top: 0.5rem;
+      box-shadow: 0 0 8px rgba(156,236,252,0.45);
+    }
     .case-card__before-after {
       display: grid; gap: 0.5rem; margin: 1.2rem 0;
       padding: 1.1rem 1.2rem;
@@ -779,24 +803,37 @@
        MOBILE OVERRIDES
        ========================================================== */
     @media (max-width: 720px) {
-      /* Hero · kleinere Schrift, weniger Padding, voller Viewport */
+      /* Hero · stabile Breite, kleinere Schrift, kein Overflow */
       section.sect-hero {
-        padding: 2.6rem 1.1rem 3.2rem;
-        min-height: auto;
+        padding: 2.4rem 1.1rem 3rem !important;
+        min-height: auto !important;
+        display: block !important;
+        text-align: center;
+      }
+      section.sect-hero .max-c { width: 100%; max-width: 100%; padding: 0; }
+      .hero__copy {
+        max-width: 100% !important;
+        padding: 0 0.2rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
       }
       .hero__h1 {
-        font-size: clamp(1.35rem, 6.5vw, 1.85rem) !important;
-        line-height: 1.15 !important;
+        font-size: clamp(1.3rem, 5.6vw, 1.7rem) !important;
+        line-height: 1.18 !important;
         max-width: 100% !important;
         margin: 1rem auto 1rem !important;
+        text-wrap: pretty !important;
+        -webkit-text-wrap: pretty !important;
+        word-break: normal;
+        hyphens: auto;
       }
-      .hero__copy { max-width: 100% !important; }
       .hero__sub {
-        font-size: 0.92rem; line-height: 1.5; margin-bottom: 1.4rem;
+        font-size: 0.92rem; line-height: 1.5; margin-bottom: 1.3rem;
         max-width: 100%;
       }
       .hero__sub-cta { font-size: 0.78rem; }
-      .pill { font-size: 0.62rem; padding: 0.32rem 0.7rem; letter-spacing: 0.1em; }
+      .pill { font-size: 0.62rem; padding: 0.32rem 0.7rem; letter-spacing: 0.1em; max-width: 100%; white-space: normal; line-height: 1.4; }
 
       /* Hero-Logos · auf Mobile schmaler */
       .hero-logos { max-width: 92%; margin-top: 1.8rem; }
@@ -816,6 +853,8 @@
       .case-card__role { font-size: 0.84rem; line-height: 1.4; }
       .case-card__metric { font-size: clamp(1.55rem, 6.5vw, 1.95rem); text-align: center; }
       .case-card__sub { text-align: center; }
+      .case-card__bullets { justify-items: center; }
+      .case-card__bullets li { text-align: left; }
       .case-card__before-after { text-align: left; }
       .case-card__quote { text-align: left; }
     }
@@ -853,7 +892,7 @@
   </div>
 
   <!-- ================= HERO ================= -->
-  <section class="sect-hero bg-radial-jc has-fade-bottom" style="display: flex; align-items: center; justify-content: center; isolation: isolate; text-align: center; min-height: 78vh;">
+  <section class="sect-hero bg-radial-jc has-fade-bottom">
     <div class="bg-grid" style="position: absolute; inset: 0; pointer-events: none;"></div>
 
     <!-- Hero-Persons · seitlich im Hintergrund (wie Hauptseite) -->
@@ -971,9 +1010,9 @@
       <article class="prose prose--center fade-up">
         <h2><span class="text-wg-grad">Für IT-Dienstleister,<br /> die ohne Empfehlungen<br class="d" /> planbar wachsen wollen.</span></h2>
 
-        <p>Du bist Geschäftsführer eines IT-Dienstleisters, Software-Entwicklers, Systemhauses oder einer SaaS-Firma mit 5 bis 60 Mitarbeitern. Dein Neugeschäft kommt heute überwiegend über Empfehlungen oder die Bestandskunden, die Du schon hast.</p>
+        <p>Du bist Geschäftsführer eines IT-Dienstleisters, Software-Entwicklers, Systemhauses oder einer SaaS-Firma mit 5 bis 60 Mitarbeitern.<br class="m"> Dein Neugeschäft kommt heute überwiegend über Empfehlungen oder die Bestandskunden, die Du schon hast.</p>
 
-        <p>Das funktioniert, aber Du kontrollierst es nicht. Wenn ein Top-Kunde sein Budget kürzt, kippt die Planung.</p>
+        <p>Das funktioniert, aber Du kontrollierst es nicht. Wenn ein Top-Kunde sein Budget kürzt,<br class="d"> kippt die Planung.</p>
 
         <p>Du willst das ändern. <strong>Planbar. Wiederholbar.</strong> Ohne Abhängigkeit von Empfehlungen,<br class="d"> Agenturen oder einzelnen Großkunden.</p>
 
@@ -1017,7 +1056,7 @@
               <div class="speaker-card__role">Co-Founder · IT-Vertrieb</div>
             </div>
           </div>
-          <p class="speaker-card__bio">9 Jahre IT-Vertrieb. Hat das <strong style="color:#fff;">AMD-Partnernetzwerk in EMEA</strong> skaliert<br class="m"> und mit Computacenter den größten AMD-Partner gewonnen.<br class="m"> Über <strong style="color:#fff;">600 IT-Deals abgeschlossen</strong>.</p>
+          <p class="speaker-card__bio">9 Jahre IT-Vertrieb. Hat das <strong style="color:#fff;">AMD-Partnernetzwerk in EMEA</strong> skaliert<br class="m"> und mit Computacenter den größten AMD-Partner gewonnen. Über<br class="m"> <strong style="color:#fff;">600 IT-Deals abgeschlossen</strong>.</p>
         </div>
 
         <div class="speaker-card">
@@ -1061,12 +1100,12 @@
             </div>
             <div class="case-card__head-text">
               <span class="case-card__name">Ferdinand Biere, CEO</span>
-              <span class="case-card__role">IT-Dienstleister · Anbieter für Unternehmens-KI-Infrastruktur</span>
+              <span class="case-card__role">IT-Dienstleister · Anbieter<br class="m"> für Unternehmens-KI-Infrastruktur</span>
             </div>
           </div>
 
-          <div class="case-card__metric">600.000&nbsp;€ Neukundenumsatz in 4 Monaten.</div>
-          <p class="case-card__sub">100.000 € davon allein in den ersten 2 Monaten.</p>
+          <div class="case-card__metric">600.000&nbsp;€ Neukundenumsatz in<br class="m"> 4 Monaten.</div>
+          <p class="case-card__sub">100.000 € davon allein in den<br class="m"> ersten 2 Monaten.</p>
 
           <div class="case-card__before-after">
             <p><strong>Vorher:</strong> „IT-Lösungen aus einer Hand". Austauschbar. Pipeline lebte von Empfehlungen.</p>
@@ -1093,7 +1132,13 @@
           </div>
 
           <div class="case-card__metric">3 Monate. 144 qualifizierte Termine.<br class="d"> 154.000&nbsp;€ Umsatz.</div>
-          <p class="case-card__sub">Bei 12.027 € Werbebudget. Umsatz aus eigenen Kampagnen. Ohne Empfehlungen, ohne Großkunden-Abhängigkeit.</p>
+
+          <ul class="case-card__bullets">
+            <li>Bei 12.027&nbsp;€ Werbebudget</li>
+            <li>Umsatz aus eigenen Kampagnen</li>
+            <li>Ohne Empfehlungen</li>
+            <li>Ohne Großkunden-Abhängigkeit</li>
+          </ul>
 
           <div class="case-card__before-after">
             <p><strong>Vorher:</strong> Erfahrung mit Agenturen und eigenen Versuchen. Kein verlässlicher Prozess.<br class="d"> Mal Kunden, dann lange nichts. Zeit gegen Geld.</p>
