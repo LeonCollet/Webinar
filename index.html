@@ -132,6 +132,9 @@
     /* Desktop-Only Zeilenumbruch · auf Mobile ausgeblendet */
     br.d { display: inline; }
     @media (max-width: 720px) { br.d { display: none; } }
+    /* Mobile-Only Zeilenumbruch · auf Desktop ausgeblendet */
+    br.m { display: none; }
+    @media (max-width: 720px) { br.m { display: inline; } }
 
     /* Trust Strip oben */
     .trust-strip {
@@ -771,6 +774,51 @@
       margin-bottom: 0.9rem;
       filter: drop-shadow(0 0 14px rgba(77,151,254,0.25));
     }
+
+    /* ==========================================================
+       MOBILE OVERRIDES
+       ========================================================== */
+    @media (max-width: 720px) {
+      /* Hero · kleinere Schrift, weniger Padding, voller Viewport */
+      section.sect-hero {
+        padding: 2.6rem 1.1rem 3.2rem;
+        min-height: auto;
+      }
+      .hero__h1 {
+        font-size: clamp(1.35rem, 6.5vw, 1.85rem) !important;
+        line-height: 1.15 !important;
+        max-width: 100% !important;
+        margin: 1rem auto 1rem !important;
+      }
+      .hero__copy { max-width: 100% !important; }
+      .hero__sub {
+        font-size: 0.92rem; line-height: 1.5; margin-bottom: 1.4rem;
+        max-width: 100%;
+      }
+      .hero__sub-cta { font-size: 0.78rem; }
+      .pill { font-size: 0.62rem; padding: 0.32rem 0.7rem; letter-spacing: 0.1em; }
+
+      /* Hero-Logos · auf Mobile schmaler */
+      .hero-logos { max-width: 92%; margin-top: 1.8rem; }
+      .hero-logos__label { font-size: 0.6rem; margin-bottom: 0.7rem; }
+
+      /* Case-Cards · alles zentriert auf Mobile */
+      .case-card { padding: 1.6rem 1.3rem; text-align: center; }
+      .case-card__head {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .case-card__head-text { align-items: center; text-align: center; }
+      .case-card__name { font-size: 1.05rem; }
+      .case-card__role { font-size: 0.84rem; line-height: 1.4; }
+      .case-card__metric { font-size: clamp(1.55rem, 6.5vw, 1.95rem); text-align: center; }
+      .case-card__sub { text-align: center; }
+      .case-card__before-after { text-align: left; }
+      .case-card__quote { text-align: left; }
+    }
   </style>
 </head>
 <body>
@@ -896,18 +944,18 @@
         <div class="wf-card">
           <div class="wf-card__num">01</div>
           <div class="wf-card__title">Warum 90% der IT-Dienstleister<br class="d"> 2026 unsichtbar sind</div>
-          <div class="wf-card__sub">Und was die anderen 10% anders machen. Wir zeigen das Muster, das wir bei<br class="d"> über 50 Kunden gesehen haben.</div>
+          <div class="wf-card__sub">Und was die anderen 10% anders machen.<br class="d"> Wir zeigen das Muster, das wir bei<br class="d"> über 50 Kunden gesehen haben.</div>
         </div>
 
         <div class="wf-card">
           <div class="wf-card__num">02</div>
           <div class="wf-card__title">Das 3-Schritte-System für eine<br class="d"> planbare Pipeline in 90 Tagen</div>
-          <div class="wf-card__sub">Glasklare Zielgruppe. Planbare Anfragen. Delegierbarer Sales-Prozess. In dieser Reihenfolge. Jeder Schritt baut auf<br class="d"> dem vorherigen auf.</div>
+          <div class="wf-card__sub">Glasklare Zielgruppe. Planbare Anfragen. Delegierbarer Sales-Prozess. In dieser Reihenfolge. Jeder Schritt baut auf<br> dem vorherigen auf.</div>
         </div>
 
         <div class="wf-card">
           <div class="wf-card__num">03</div>
-          <div class="wf-card__title">Live-Einblick in eine<br class="d"> echte IT-Kampagne</div>
+          <div class="wf-card__title">Live-Einblick in eine<br> echte IT-Kampagne</div>
           <div class="wf-card__sub">Echte Zahlen, echte Accounts. Martin Krutzfeld (Softwareentwickler): 3 Monate, 144 Termine, 12.027 € Werbebudget, 154.000 € Umsatz.</div>
         </div>
 
@@ -923,11 +971,13 @@
       <article class="prose prose--center fade-up">
         <h2><span class="text-wg-grad">Für IT-Dienstleister,<br /> die ohne Empfehlungen<br class="d" /> planbar wachsen wollen.</span></h2>
 
-        <p>Du bist Geschäftsführer eines IT-Dienstleisters, Software-Entwicklers, Systemhauses oder einer SaaS-Firma mit 5 bis 60 Mitarbeitern. Dein Neugeschäft kommt heute überwiegend über Empfehlungen oder die Bestandskunden, die Du schon hast. Das funktioniert, aber Du kontrollierst es nicht. Wenn ein Top-Kunde sein Budget kürzt, kippt die Planung.</p>
+        <p>Du bist Geschäftsführer eines IT-Dienstleisters, Software-Entwicklers, Systemhauses oder einer SaaS-Firma mit 5 bis 60 Mitarbeitern. Dein Neugeschäft kommt heute überwiegend über Empfehlungen oder die Bestandskunden, die Du schon hast.</p>
+
+        <p>Das funktioniert, aber Du kontrollierst es nicht. Wenn ein Top-Kunde sein Budget kürzt, kippt die Planung.</p>
 
         <p>Du willst das ändern. <strong>Planbar. Wiederholbar.</strong> Ohne Abhängigkeit von Empfehlungen,<br class="d"> Agenturen oder einzelnen Großkunden.</p>
 
-        <p>Wenn das auf Dich passt, ist dieses Live-Training für Dich gebaut.</p>
+        <p>Wenn das auf Dich passt, ist dieses<br class="m"> Live-Training für Dich gebaut.</p>
       </article>
 
       <div class="fade-up" style="display: flex; justify-content: center; margin-top: 2.5rem;">
@@ -967,7 +1017,7 @@
               <div class="speaker-card__role">Co-Founder · IT-Vertrieb</div>
             </div>
           </div>
-          <p class="speaker-card__bio">9 Jahre IT-Vertrieb. Hat das <strong style="color:#fff;">AMD-Partnernetzwerk in EMEA</strong> skaliert und mit Computacenter den größten AMD-Partner gewonnen. Über <strong style="color:#fff;">600 IT-Deals abgeschlossen</strong>.</p>
+          <p class="speaker-card__bio">9 Jahre IT-Vertrieb. Hat das <strong style="color:#fff;">AMD-Partnernetzwerk in EMEA</strong> skaliert<br class="m"> und mit Computacenter den größten AMD-Partner gewonnen.<br class="m"> Über <strong style="color:#fff;">600 IT-Deals abgeschlossen</strong>.</p>
         </div>
 
         <div class="speaker-card">
@@ -1070,10 +1120,10 @@
       </div>
 
       <div class="takeaway-list stagger">
-        <div class="takeaway-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l4.5 4.5L20 6"/></svg><span>Das vollständige <b>3-Schritte-System</b>, das Du selbst nachbauen kannst.</span></div>
-        <div class="takeaway-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l4.5 4.5L20 6"/></svg><span>Unser internes <b>Idealkunden-Worksheet</b> zur Definition Deines ICP.</span></div>
-        <div class="takeaway-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l4.5 4.5L20 6"/></svg><span>Den dazugehörigen <b>Idealkunden-GPT</b>.</span></div>
-        <div class="takeaway-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l4.5 4.5L20 6"/></svg><span>Die <b>Aufzeichnung des Webinars</b> zum Nachbauen des kompletten Prozesses.</span></div>
+        <div class="takeaway-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l4.5 4.5L20 6"/></svg><span>Das vollständige <b>3-Schritte-System</b>, das Du selbst<br class="m"> nachbauen kannst.</span></div>
+        <div class="takeaway-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l4.5 4.5L20 6"/></svg><span>Unser internes <b>Idealkunden-Worksheet</b> zur Definition<br class="m"> Deines ICP.</span></div>
+        <div class="takeaway-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l4.5 4.5L20 6"/></svg><span>Den dazugehörigen<br class="m"> <b>Idealkunden-GPT</b>.</span></div>
+        <div class="takeaway-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l4.5 4.5L20 6"/></svg><span>Die <b>Aufzeichnung des Webinars</b> zum Nachbauen des<br class="m"> kompletten Prozesses.</span></div>
       </div>
 
       <p class="takeaway-value fade-up">
@@ -1089,7 +1139,7 @@
 
       <div class="sect-h fade-up">
         <span class="pill">Jetzt Platz sichern</span>
-        <h2><span class="text-wg-grad">Mittwoch, 17. Juni, 11:00 Uhr.</span></h2>
+        <h2><span class="text-wg-grad">Mittwoch,<br class="m"> 17. Juni, 11:00 Uhr.</span></h2>
         <p>60 Minuten. Live mit Frederik und Andreas. Drei Schritte, echte Zahlen, plus Q&amp;A am Ende. Kein Re-Run.<br class="d"> Die Aufzeichnung gibt es nur für die, die sich angemeldet haben.</p>
       </div>
 
