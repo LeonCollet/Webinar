@@ -408,7 +408,12 @@
       .hero__video-sound {
         position: absolute;
         bottom: 10px; right: 10px;
-        z-index: 5;
+        z-index: 10;
+        pointer-events: auto;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;
+        user-select: none;
         display: inline-flex; align-items: center; gap: 0.5rem;
         height: 36px; padding: 0 0.85rem 0 0.65rem;
         border-radius: 999px;
@@ -1436,38 +1441,19 @@
 </main>
 
 <script>
-  /* Hero-Video · Sound-aktivieren + Play/Pause via Vimeo Player.js */
+  /* Hero-Video · Sound-Toggle via iframe-src Reload (garantiert funktional) */
   (() => {
     const iframe = document.getElementById('hero-video-iframe');
     const btn = document.getElementById('hero-video-sound');
     if (!iframe || !btn) return;
 
-    let player = null;
-    const ensurePlayer = () => new Promise((resolve, reject) => {
-      if (window.Vimeo && window.Vimeo.Player) {
-        if (!player) player = new window.Vimeo.Player(iframe);
-        return resolve(player);
-      }
-      const existing = document.querySelector('script[data-vimeo-loader]');
-      if (existing) {
-        existing.addEventListener('load', () => {
-          if (!player) player = new window.Vimeo.Player(iframe);
-          resolve(player);
-        });
-        return;
-      }
-      const s = document.createElement('script');
-      s.src = 'https://player.vimeo.com/api/player.js';
-      s.async = true;
-      s.dataset.vimeoLoader = '1';
-      s.onload  = () => { player = new window.Vimeo.Player(iframe); resolve(player); };
-      s.onerror = () => reject(new Error('Vimeo SDK load failed'));
-      document.head.appendChild(s);
-    });
+    // Basis-URL ohne muted-Parameter (wir hängen muted=0 oder muted=1 dynamisch an)
+    const VIDEO_ID = '1168533250';
+    const buildSrc = (muted) =>
+      `https://player.vimeo.com/video/${VIDEO_ID}?autoplay=1&loop=1&controls=0&title=0&byline=0&portrait=0&playsinline=1&dnt=1&keyboard=0&pip=0&muted=${muted ? 1 : 0}`;
 
-    // States: 'activate' (default · Pulse) · 'sound' (Ton an) · 'muted' (Ton aus)
+    // States: 'activate' (Default · Pulse) · 'sound' (Ton an) · 'muted' (Ton aus)
     let state = 'activate';
-    let busy = false;
 
     const setState = (next) => {
       state = next;
@@ -1480,40 +1466,24 @@
         : 'Ton einschalten');
     };
 
-    btn.addEventListener('click', async () => {
-      console.log('[Hero-Video] click · state=', state, 'busy=', busy);
-      if (busy) return;
-      busy = true;
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
       const prev = state;
+      // 1) UI sofort umschalten
       const nextUi = prev === 'activate' ? 'sound'
                   : prev === 'sound'    ? 'muted'
                   : 'sound';
       setState(nextUi);
-      console.log('[Hero-Video] new state=', nextUi);
 
-      try {
-        const p = await ensurePlayer();
-        if (prev === 'activate') {
-          await p.setMuted(false);
-          try { await p.setVolume(1); } catch(e) {}
-          try { await p.setCurrentTime(0); } catch(e) {}
-          await p.play();
-          console.log('[Hero-Video] unmuted + restarted');
-        } else if (prev === 'sound') {
-          await p.setMuted(true);
-          try { await p.setVolume(0); } catch(e) {}
-          console.log('[Hero-Video] muted');
-        } else if (prev === 'muted') {
-          await p.setMuted(false);
-          try { await p.setVolume(1); } catch(e) {}
-          console.log('[Hero-Video] unmuted');
-        }
-      } catch (e) {
-        console.warn('[Hero-Video] Vimeo-Call fehlgeschlagen:', e);
-      } finally {
-        busy = false;
-      }
-    });
+      // 2) iframe.src austauschen → garantierte mute/unmute Wirkung
+      //    'activate' → unmute (sound an, startet von 0)
+      //    'sound'    → mute   (Ton aus, startet von 0)
+      //    'muted'    → unmute (Ton an,  startet von 0)
+      const wantMuted = (nextUi === 'muted');
+      iframe.src = buildSrc(wantMuted);
+    }, { passive: false });
   })();
 
   /* Live-Countdown bis 17.06.2026 11:00 Uhr Europe/Berlin */
