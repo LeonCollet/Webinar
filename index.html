@@ -1445,48 +1445,65 @@
     if (!iframe || !btn) return;
 
     let player = null;
-    const ensurePlayer = () => new Promise((resolve) => {
+    const ensurePlayer = () => new Promise((resolve, reject) => {
       if (window.Vimeo && window.Vimeo.Player) {
         if (!player) player = new window.Vimeo.Player(iframe);
         return resolve(player);
       }
+      const existing = document.querySelector('script[data-vimeo-loader]');
+      if (existing) { existing.addEventListener('load', () => { player = new window.Vimeo.Player(iframe); resolve(player); }); return; }
       const s = document.createElement('script');
       s.src = 'https://player.vimeo.com/api/player.js';
       s.async = true;
-      s.onload = () => { player = new window.Vimeo.Player(iframe); resolve(player); };
+      s.dataset.vimeoLoader = '1';
+      s.onload  = () => { player = new window.Vimeo.Player(iframe); resolve(player); };
+      s.onerror = () => reject(new Error('Vimeo SDK load failed'));
       document.head.appendChild(s);
     });
 
     // States: 'activate' (default) · 'playing' · 'paused'
     let state = 'activate';
+    let busy = false;
 
     const setState = (next) => {
       state = next;
-      btn.classList.toggle('is-playing', next === 'playing');
-      btn.classList.toggle('is-paused',  next === 'paused');
-      if (next === 'activate') btn.setAttribute('aria-label', 'Ton einschalten');
-      else if (next === 'playing') btn.setAttribute('aria-label', 'Pause');
-      else if (next === 'paused')  btn.setAttribute('aria-label', 'Weiter abspielen');
+      btn.classList.remove('is-playing', 'is-paused');
+      if (next === 'playing') btn.classList.add('is-playing');
+      else if (next === 'paused')  btn.classList.add('is-paused');
+      btn.setAttribute('aria-label',
+        next === 'activate' ? 'Ton einschalten'
+        : next === 'playing' ? 'Pause'
+        : 'Weiter abspielen');
     };
 
     btn.addEventListener('click', async () => {
+      if (busy) return;
+      busy = true;
+      // 1) UI sofort umschalten — unabhängig vom Vimeo-Result
+      const prev = state;
+      const nextUi = prev === 'activate' ? 'playing'
+                  : prev === 'playing'  ? 'paused'
+                  : 'playing';
+      setState(nextUi);
+
+      // 2) Vimeo-Befehle dahinter (defensiv)
       try {
         const p = await ensurePlayer();
-        if (state === 'activate') {
+        if (prev === 'activate') {
           await p.setMuted(false);
-          await p.setVolume(1);
-          await p.setCurrentTime(0);
+          try { await p.setVolume(1); } catch(e) {}
+          try { await p.setCurrentTime(0); } catch(e) {}
           await p.play();
-          setState('playing');
-        } else if (state === 'playing') {
+        } else if (prev === 'playing') {
           await p.pause();
-          setState('paused');
-        } else if (state === 'paused') {
-          // Ton bleibt an, einfach weiterspielen
+        } else if (prev === 'paused') {
           await p.play();
-          setState('playing');
         }
-      } catch (e) { /* leise scheitern */ }
+      } catch (e) {
+        console.warn('[Hero-Video] Vimeo-Call fehlgeschlagen:', e);
+      } finally {
+        busy = false;
+      }
     });
   })();
 
