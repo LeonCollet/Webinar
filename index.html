@@ -454,12 +454,11 @@
         width: 20px; height: 20px;
         color: var(--jc-blue-100);
       }
-      .hero__video-sound .ic-pause,
-      .hero__video-sound .ic-play { display: none; }
+      .hero__video-sound .ic-sound { display: none; }
 
-      /* State: Playing (Pause-Button) · kompakter Kreis */
-      .hero__video-sound.is-playing,
-      .hero__video-sound.is-paused {
+      /* States nach erstem Klick · kompakter runder Toggle */
+      .hero__video-sound.is-sound,
+      .hero__video-sound.is-muted {
         padding: 0;
         width: 36px; height: 36px;
         border-radius: 50%;
@@ -467,22 +466,23 @@
         animation: none;
         transform: none;
       }
-      .hero__video-sound.is-playing .hero__video-sound__label,
-      .hero__video-sound.is-paused  .hero__video-sound__label { display: none; }
-      .hero__video-sound.is-playing .ic-mute,
-      .hero__video-sound.is-paused  .ic-mute { display: none; }
+      .hero__video-sound.is-sound .hero__video-sound__label,
+      .hero__video-sound.is-muted .hero__video-sound__label { display: none; }
 
-      .hero__video-sound.is-playing {
-        background: rgba(5,9,19,0.78);
-        border-color: rgba(156,236,252,0.4);
-      }
-      .hero__video-sound.is-playing .ic-pause { display: block; color: #fff; }
-
-      .hero__video-sound.is-paused {
+      /* is-sound: Ton an, zeigt Lautsprecher-mit-Wellen */
+      .hero__video-sound.is-sound {
         background: linear-gradient(120deg, rgba(77,151,254,0.6), rgba(14,165,233,0.6));
         border-color: rgba(255,255,255,0.55);
       }
-      .hero__video-sound.is-paused .ic-play { display: block; color: #fff; }
+      .hero__video-sound.is-sound .ic-mute { display: none; }
+      .hero__video-sound.is-sound .ic-sound { display: block; color: #fff; }
+
+      /* is-muted: gemutet, zeigt Lautsprecher-mit-X */
+      .hero__video-sound.is-muted {
+        background: rgba(5,9,19,0.78);
+        border-color: rgba(156,236,252,0.4);
+      }
+      .hero__video-sound.is-muted .ic-mute { display: block; color: #fff; }
     }
 
     /* Hero-Persons · Andi + Freddy seitlich im Background */
@@ -1050,20 +1050,17 @@
 
             <button class="hero__video-sound" id="hero-video-sound" type="button" aria-label="Ton einschalten">
               <span class="hero__video-sound__icon" aria-hidden="true">
-                <!-- Muted Icon (default · "Ton an" Phase) -->
+                <!-- Muted Icon (default + "muted"-State) -->
                 <svg class="ic-mute" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
                   <line x1="22" y1="9" x2="16" y2="15"/>
                   <line x1="16" y1="9" x2="22" y2="15"/>
                 </svg>
-                <!-- Pause Icon -->
-                <svg class="ic-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="6" y="4" width="4" height="16" rx="1"/>
-                  <rect x="14" y="4" width="4" height="16" rx="1"/>
-                </svg>
-                <!-- Play Icon -->
-                <svg class="ic-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M7 4l13 8-13 8V4z"/>
+                <!-- Sound-On Icon (Lautsprecher mit Wellen) -->
+                <svg class="ic-sound" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
                 </svg>
               </span>
               <span class="hero__video-sound__label">Ton an</span>
@@ -1445,32 +1442,15 @@
     if (!iframe || !btn) return;
 
     let player = null;
-    const attachPlayerEvents = (p) => {
-      // Wenn Vimeo selbst spielt/pausiert (z.B. User tippt aufs Video), Button-State syncen
-      p.on('pause', () => {
-        if (state !== 'activate' && state !== 'paused') {
-          state = 'paused';
-          btn.classList.remove('is-playing');
-          btn.classList.add('is-paused');
-        }
-      });
-      p.on('play', () => {
-        if (state === 'paused' || state === 'playing') {
-          state = 'playing';
-          btn.classList.remove('is-paused');
-          btn.classList.add('is-playing');
-        }
-      });
-    };
     const ensurePlayer = () => new Promise((resolve, reject) => {
       if (window.Vimeo && window.Vimeo.Player) {
-        if (!player) { player = new window.Vimeo.Player(iframe); attachPlayerEvents(player); }
+        if (!player) player = new window.Vimeo.Player(iframe);
         return resolve(player);
       }
       const existing = document.querySelector('script[data-vimeo-loader]');
       if (existing) {
         existing.addEventListener('load', () => {
-          if (!player) { player = new window.Vimeo.Player(iframe); attachPlayerEvents(player); }
+          if (!player) player = new window.Vimeo.Player(iframe);
           resolve(player);
         });
         return;
@@ -1479,48 +1459,51 @@
       s.src = 'https://player.vimeo.com/api/player.js';
       s.async = true;
       s.dataset.vimeoLoader = '1';
-      s.onload  = () => { player = new window.Vimeo.Player(iframe); attachPlayerEvents(player); resolve(player); };
+      s.onload  = () => { player = new window.Vimeo.Player(iframe); resolve(player); };
       s.onerror = () => reject(new Error('Vimeo SDK load failed'));
       document.head.appendChild(s);
     });
 
-    // States: 'activate' (default) · 'playing' · 'paused'
+    // States: 'activate' (default · Pulse) · 'sound' (Ton an) · 'muted' (Ton aus)
     let state = 'activate';
     let busy = false;
 
     const setState = (next) => {
       state = next;
-      btn.classList.remove('is-playing', 'is-paused');
-      if (next === 'playing') btn.classList.add('is-playing');
-      else if (next === 'paused')  btn.classList.add('is-paused');
+      btn.classList.remove('is-sound', 'is-muted');
+      if (next === 'sound') btn.classList.add('is-sound');
+      else if (next === 'muted') btn.classList.add('is-muted');
       btn.setAttribute('aria-label',
         next === 'activate' ? 'Ton einschalten'
-        : next === 'playing' ? 'Pause'
-        : 'Weiter abspielen');
+        : next === 'sound'  ? 'Ton ausschalten'
+        : 'Ton einschalten');
     };
 
     btn.addEventListener('click', async () => {
       if (busy) return;
       busy = true;
-      // 1) UI sofort umschalten — unabhängig vom Vimeo-Result
       const prev = state;
-      const nextUi = prev === 'activate' ? 'playing'
-                  : prev === 'playing'  ? 'paused'
-                  : 'playing';
+      // UI sofort umschalten
+      const nextUi = prev === 'activate' ? 'sound'
+                  : prev === 'sound'    ? 'muted'
+                  : 'sound';
       setState(nextUi);
 
-      // 2) Vimeo-Befehle dahinter (defensiv)
       try {
         const p = await ensurePlayer();
         if (prev === 'activate') {
+          // Erster Klick: Ton an + von 0 starten + abspielen
           await p.setMuted(false);
           try { await p.setVolume(1); } catch(e) {}
           try { await p.setCurrentTime(0); } catch(e) {}
           await p.play();
-        } else if (prev === 'playing') {
-          await p.pause();
-        } else if (prev === 'paused') {
-          await p.play();
+        } else if (prev === 'sound') {
+          // Muten — Video läuft weiter
+          await p.setMuted(true);
+        } else if (prev === 'muted') {
+          // Entmuten — Video läuft weiter
+          await p.setMuted(false);
+          try { await p.setVolume(1); } catch(e) {}
         }
       } catch (e) {
         console.warn('[Hero-Video] Vimeo-Call fehlgeschlagen:', e);
